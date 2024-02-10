@@ -79,8 +79,17 @@ describe('HurricaneServiceService', () => {
       expect(result).toEqual(expectedResult);
     });
 
+    it('should handle empty months when calculating possibility for a month', async () => {
+      const expectedResult = undefined; // Expected value for Average = 0.5
+
+      const result = await service.calculatePossibilityForMonth(
+        'Jan',
+        hurricanesData,
+      );
+      expect(result).toEqual(expectedResult);
+    });
+
     it('should handle error when calculating possibility for a month', async () => {
-      const errorMessage = 'Failed to fetch hurricanes data. Please try again.';
       jest.spyOn(service['logger'], 'error');
       await expect(
         service.calculatePossibilityForMonth('Jan', hurricanesData),
