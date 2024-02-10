@@ -1,30 +1,34 @@
+ 
 <p align="center">
+
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
+# Hurricane-analyser
+#### Nest.js + Typescript
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
+This program provides insights about the occurrence of hurricanes based on historical data.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+using Poisson distribution formula to calculate the probability of hurricane occurrence 
+in a given month in the future.
+https://en.wikipedia.org/wiki/Poisson_distribution
+
+This backend contains two Rest API endpoints:
+ - /api/hurricanes/all
+ - /api/hurricanes/expect/:monthString ex: [Jan, Feb, ....]
+
+The program is using the following file as the data source:
+https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv
+
+Assumption: - user only need to provide the month name to get the probability of a hurricane.
+
+## Environment Prerequisites
+- Node.js >= 20.10.0
+- npm >= 10.2.3
+- Typescript >= 5.0.0
 
 ## Installation
 
@@ -58,16 +62,24 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Run the application (please have a look to scripts in package.json )
+in the root dir of the project root 'hurricane-analyser'
+- to install dependencies $- npm install
+- to run in dev mode  $- npm start dev
+- to run in debug mode  $- npm start debug
+- on deployment $- npm run build start prod $- npm start prod
 
-## License
+Testing the application
+in the root dir of the project root 'hurricane-analyser'
+-  run unit-tests $- npm test
+-  run tests with Coverage info $- npm run test:cov
+-  run e2e test $- npm run test:e2e
 
-Nest is [MIT licensed](LICENSE).
+
+if i have more time
+
+i will Use Interceptors
+i will cover the test code 95% +
