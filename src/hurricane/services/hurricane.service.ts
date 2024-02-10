@@ -42,50 +42,93 @@ export class HurricaneService {
   async parseData(data: string): Promise<IHurricane> {
     try {
       const lines: string[] = data.trim().split('\n');
-      const headers: string[] | undefined = lines.shift()?.trim().split(',');
+      const headers: string[] | undefined = this.extractHeaders(lines);
 
-      // handle empty data
-      if (!headers || data === '') {
-        this.logger.error('Invalid data format');
-        return;
-      }
+      this.validateData(headers, data);
 
-      // Remove "Month" header
-      headers.shift();
+      headers.shift(); // Remove "Month" header
 
       lines.forEach((line: string) => {
-        // get each month values
         const values: string[] = line.trim().split(',');
+        const monthHeader: string = this.extractMonthHeader(values);
 
-        // get month name
-        const month = values.shift()?.trim();
-
-        // convert month name to json key
-        const monthHeader: string = JSON.parse(month.toString());
-
-        // setting average for each month
-        this.hurricaneData[monthHeader] = {
-          Average: values['Average'] as never,
-        };
+        this.setAverageForMonth(monthHeader, values);
 
         headers.forEach((year: string, index: number) => {
           year = JSON.parse(year);
           let value: any = values[index];
-
-          // if year === Average then parse value to float because it's not an occurrence number for year
-          year === 'Average'
-            ? (value = parseFloat(value).toFixed(2))
-            : (value = parseInt(value));
-
-          // if year !== Average then value is an occurrence number
+          value = this.parseValue(year, value);
           this.hurricaneData[monthHeader][year] = value;
         });
       });
+
       return this.hurricaneData;
     } catch (error) {
-      this.logger.error(`Failed to parse hurricanes data - ${error.message}`);
-      throw new Error('Failed to parse hurricanes data.');
+      this.handleParseError(error);
     }
+  }
+
+  /**
+   * Extract header from Data
+   * @param lines
+   * @private
+   */
+  private extractHeaders(lines: string[]): string[] | undefined {
+    return lines.shift()?.trim().split(',');
+  }
+
+  /**
+   * Validate data
+   * @param headers
+   * @param data
+   * @private
+   */
+  private validateData(headers: string[] | undefined, data: string): void {
+    if (!headers || data === '') {
+      this.logger.error('Invalid data format');
+      throw new Error('Invalid data format');
+    }
+  }
+
+  /**
+   * Extract month header
+   * @param values
+   * @private
+   */
+  private extractMonthHeader(values: string[]): string {
+    const month = values.shift()?.trim();
+    return JSON.parse(month!.toString());
+  }
+
+  /**
+   * Set Average
+   * @param monthHeader
+   * @param values
+   * @private
+   */
+  private setAverageForMonth(monthHeader: string, values: string[]): void {
+    this.hurricaneData[monthHeader] = {
+      Average: values['Average'] as never,
+    };
+  }
+
+  /**
+   * Parse year
+   * @param year
+   * @param value
+   * @private
+   */
+  private parseValue(year: string, value: any): any {
+    return year === 'Average' ? parseFloat(value).toFixed(2) : parseInt(value);
+  }
+
+  /**
+   * Handle parse error
+   * @param error
+   * @private
+   */
+  private handleParseError(error: any): void {
+    this.logger.error(`Failed to parse hurricanes data - ${error.message}`);
   }
 
   /**
@@ -104,7 +147,7 @@ export class HurricaneService {
       const monthData: { [p: string]: number; Average: number & string } =
         hurricanesData[futureMonth];
       if (!monthData) {
-        return;
+        return null;
       }
       type avgType = string | number;
       let avg: avgType = monthData['Average'];
@@ -130,7 +173,7 @@ export class HurricaneService {
     try {
       const data: string = await this.loadDataFromUrl();
       if (!data) {
-        return;
+        return null;
       }
       return this.parseData(data);
     } catch (error) {
@@ -148,12 +191,12 @@ export class HurricaneService {
     try {
       const hurricanesData: IHurricane = await this.getHurricanes();
       if (!hurricanesData) {
-        return;
+        return null;
       }
       return await this.calculatePossibilityForMonth(month, hurricanesData);
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
-      return;
+      return null;
     }
   }
 }
