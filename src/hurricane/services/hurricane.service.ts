@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AppLogger } from '../../logger/AppLogger';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import axios from 'axios';
+import { IMonth } from '../interfaces/IMonth.interface';
 
 /**
  * Service responsible for managing hurricane-related operations.
@@ -144,14 +145,16 @@ export class HurricaneService {
     hurricanesData: IHurricane,
   ): Promise<number | null> {
     try {
-      const monthData: { [p: string]: number; Average: number & string } =
-        hurricanesData[futureMonth];
+      const monthData: IMonth = hurricanesData[futureMonth];
+
       if (!monthData) {
         return null;
       }
-      type avgType = string | number;
-      let avg: avgType = monthData['Average'];
-      // handle if Avg in the data source to this month = 0.0;
+      // use union type to ensure type safety with more than one type
+      let avg: string | number = monthData['Average'];
+
+      // if Avg in the data source to this month = 0.0
+      // then set average to 0.01 to prevent Zero probability
       avg = avg === '0.00' ? 0.01 : parseFloat(monthData['Average']);
       // Calculate the probability of observing zero hurricanes
       const probabilityOfZero = Math.exp(-avg);
