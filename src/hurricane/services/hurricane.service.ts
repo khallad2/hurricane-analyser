@@ -47,7 +47,7 @@ export class HurricaneService {
       // handle empty data
       if (!headers || data === '') {
         this.logger.error('Invalid data format');
-        throw new Error('Invalid data format');
+        return;
       }
 
       // Remove "Month" header
@@ -104,7 +104,7 @@ export class HurricaneService {
       const monthData: { [p: string]: number; Average: number & string } =
         hurricanesData[futureMonth];
       if (!monthData) {
-        throw new Error('Failed to fetch hurricanes data. Please try again.');
+        return;
       }
       type avgType = string | number;
       let avg: avgType = monthData['Average'];
@@ -129,6 +129,9 @@ export class HurricaneService {
   async getHurricanes(): Promise<IHurricane> {
     try {
       const data: string = await this.loadDataFromUrl();
+      if (!data) {
+        return;
+      }
       return this.parseData(data);
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
@@ -144,10 +147,13 @@ export class HurricaneService {
   async hurricanePossibility(month: string): Promise<number | null> {
     try {
       const hurricanesData: IHurricane = await this.getHurricanes();
+      if (!hurricanesData) {
+        return;
+      }
       return await this.calculatePossibilityForMonth(month, hurricanesData);
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
-      return null;
+      return;
     }
   }
 }
