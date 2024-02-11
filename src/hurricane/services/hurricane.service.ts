@@ -5,7 +5,6 @@ import { AppLogger } from '../../logger/AppLogger';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import axios from 'axios';
 import { IMonth } from '../interfaces/IMonth.interface';
-import { ITransformedData } from '../interfaces/transformed-response.interface';
 import { Readable } from 'stream';
 import { constants } from '../../../constants';
 
@@ -213,49 +212,6 @@ export class HurricaneService {
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
       return null;
-    }
-  }
-
-  /**
-   * Transforms the hurricanes data into the desired structure.
-   * @param hurricanesData - The hurricanes data to transform.
-   * @returns {ITransformedData} The transformed hurricanes' data.
-   */
-  transformHurricanesData(hurricanesData: IHurricane): ITransformedData {
-    const transformedData: ITransformedData = {
-      years: {},
-      months: {},
-    };
-    try {
-      // Extract years and months data from the input hurricanesData
-      for (const month in hurricanesData) {
-        if (hurricanesData.hasOwnProperty(month)) {
-          const data = hurricanesData[month];
-          if (typeof data === 'object' && data !== null) {
-            for (const year in data) {
-              if (data.hasOwnProperty(year)) {
-                const value = data[year];
-                if (typeof value === 'number') {
-                  // Populate years object
-                  if (!transformedData.years[year]) {
-                    transformedData.years[year] = 0;
-                  }
-                  transformedData.years[year] += value;
-                  // Populate months object
-                  if (!transformedData.months[month]) {
-                    transformedData.months[month] = 0;
-                  }
-                  transformedData.months[month] += value;
-                }
-              }
-            }
-          }
-        }
-      }
-      return transformedData;
-    } catch (error) {
-      this.logger.error(`Error transforming hurricanes data: ${error.message}`);
-      throw new Error('Failed to transform hurricanes data.');
     }
   }
 }

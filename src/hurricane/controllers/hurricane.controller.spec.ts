@@ -4,7 +4,7 @@ import { HurricaneService } from '../services/hurricane.service';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 import { LoggerModule } from '../../logger/logger.module';
-import { transformedData } from '../../../test/test-mock-data';
+import { hurricanesData } from '../../../test/test-mock-data';
 
 describe('HurricaneController', () => {
   let controller: HurricaneController;
@@ -19,7 +19,6 @@ describe('HurricaneController', () => {
           provide: HurricaneService,
           useValue: {
             getHurricanes: jest.fn(),
-            transformHurricanesData: jest.fn(),
             hurricanePossibility: jest.fn(),
           },
         },
@@ -38,8 +37,7 @@ describe('HurricaneController', () => {
     it('should return all hurricanes data', async () => {
       jest
         .spyOn(hurricaneService, 'getHurricanes')
-        .mockResolvedValue(transformedData as never);
-
+        .mockResolvedValue(hurricanesData);
       // Mock the response object
       const response: Partial<Response> = {
         status: jest.fn().mockReturnThis(), // mockReturnThis is optional but can improve readability
@@ -48,9 +46,6 @@ describe('HurricaneController', () => {
 
       // Call the controller method
       await controller.fetchAllHurricanes(response as Response);
-      const expected = hurricaneService.transformHurricanesData(
-        response.json() as any,
-      );
 
       // Verify that the status method was called with OK status
       expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -59,7 +54,7 @@ describe('HurricaneController', () => {
       expect(response.json).toHaveBeenCalledWith({
         success: true,
         message: 'Hurricanes data fetched successfully',
-        data: expected,
+        data: hurricanesData,
       });
     });
 

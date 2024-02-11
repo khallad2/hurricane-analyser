@@ -34,12 +34,11 @@ export class HurricaneController {
           data: {},
         });
       }
-      const transformedData =
-        this.hurricaneService.transformHurricanesData(hurricanesData);
+
       return response.status(HttpStatus.OK).json({
         success: true,
         message: 'Hurricanes data fetched successfully',
-        data: transformedData,
+        data: hurricanesData,
       });
     } catch (error) {
       this.logger.error(`Error fetching hurricanes data: ${error.message}`);
