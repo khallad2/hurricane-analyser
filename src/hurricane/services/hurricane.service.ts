@@ -7,6 +7,7 @@ import axios from 'axios';
 import { IMonth } from '../interfaces/IMonth.interface';
 import { ITransformedData } from '../interfaces/transformed-response.interface';
 import { Readable } from 'stream';
+import { constants } from '../../../constants';
 
 /**
  * Service responsible for managing hurricane-related operations.
@@ -28,7 +29,7 @@ export class HurricaneService {
     try {
       const url: string =
         this.configService.get<string>('SHEET_URL') ||
-        'https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv';
+        constants.DEFAULT_SHEET_URL;
       const response: AxiosResponse<string> = await axios.get(url);
       return response.data;
     } catch (error) {
