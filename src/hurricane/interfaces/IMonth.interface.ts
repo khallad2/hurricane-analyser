@@ -9,5 +9,5 @@ export interface IMonth {
   [p: string]: number;
 
   // use intersection type to make sure that object can handle both types
-  Average: number & string;
+  Average?: number & string;
 }

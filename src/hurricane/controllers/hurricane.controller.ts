@@ -27,18 +27,22 @@ export class HurricaneController {
         return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: 'Failed to fetch hurricanes data. Please try again.',
+          data: {},
         });
       }
+      const transformedData =
+        this.hurricaneService.transformHurricanesData(hurricanesData);
       return response.status(HttpStatus.OK).json({
         success: true,
         message: 'Hurricanes data fetched successfully',
-        data: hurricanesData,
+        data: transformedData,
       });
     } catch (error) {
       this.logger.error(`Error fetching hurricanes data: ${error.message}`);
       return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: 'Failed to fetch hurricanes data. Please try again.',
+        data: {},
       });
     }
   }

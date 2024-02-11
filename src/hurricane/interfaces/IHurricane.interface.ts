@@ -12,6 +12,6 @@ export interface IHurricane {
      * The key is the month abbreviation (e.g., Jan, Feb) and the value is the number of hurricanes.
      */
     [year: string]: number;
-    Average: number & string;
+    Average?: number & string;
   };
 }

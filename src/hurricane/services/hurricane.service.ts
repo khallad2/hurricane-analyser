@@ -5,6 +5,7 @@ import { AppLogger } from '../../logger/AppLogger';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import axios from 'axios';
 import { IMonth } from '../interfaces/IMonth.interface';
+import { ITransformedData } from '../interfaces/transofrmed-response.interface';
 
 /**
  * Service responsible for managing hurricane-related operations.
@@ -176,12 +177,14 @@ export class HurricaneService {
     try {
       const data: string = await this.loadDataFromUrl();
       if (!data) {
-        return null;
+        throw new Error('Failed to load data from the source.');
       }
-      return this.parseData(data);
+      return await this.parseData(data);
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
-      throw new Error('Failed to fetch hurricanes data. Please try again.');
+      throw new Error(
+        'Failed to load hurricanes data from source. Please try again.',
+      );
     }
   }
 
@@ -200,6 +203,50 @@ export class HurricaneService {
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
       return null;
+    }
+  }
+
+  /**
+   * Transforms the hurricanes data into the desired structure.
+   * @param hurricanesData - The hurricanes data to transform.
+   * @returns {ITransformedData} The transformed hurricanes' data.
+   */
+  transformHurricanesData(hurricanesData: IHurricane): ITransformedData {
+    const transformedData: ITransformedData = {
+      years: {},
+      months: {},
+    };
+    try {
+      // Extract years and months data from the input hurricanesData
+      for (const month in hurricanesData) {
+        if (hurricanesData.hasOwnProperty(month)) {
+          const data = hurricanesData[month];
+          if (typeof data === 'object' && data !== null) {
+            for (const year in data) {
+              if (data.hasOwnProperty(year)) {
+                const value = data[year];
+                if (typeof value === 'number') {
+                  // Populate years object
+                  if (!transformedData.years[year]) {
+                    transformedData.years[year] = 0;
+                  }
+                  transformedData.years[year] += value;
+
+                  // Populate months object
+                  if (!transformedData.months[month]) {
+                    transformedData.months[month] = 0;
+                  }
+                  transformedData.months[month] += value;
+                }
+              }
+            }
+          }
+        }
+      }
+      return transformedData;
+    } catch (error) {
+      console.error(`Error transforming hurricanes data: ${error.message}`);
+      throw new Error('Failed to transform hurricanes data.');
     }
   }
 }

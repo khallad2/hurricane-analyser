@@ -4,7 +4,7 @@ import { HurricaneService } from '../services/hurricane.service';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 import { LoggerModule } from '../../logger/logger.module';
-import { hurricanesData } from '../../../test/test-mock-data';
+import { transformedData } from '../../../test/test-mock-data';
 
 describe('HurricaneController', () => {
   let controller: HurricaneController;
@@ -19,6 +19,7 @@ describe('HurricaneController', () => {
           provide: HurricaneService,
           useValue: {
             getHurricanes: jest.fn(),
+            transformHurricanesData: jest.fn(),
             hurricanePossibility: jest.fn(),
           },
         },
@@ -37,17 +38,28 @@ describe('HurricaneController', () => {
     it('should return all hurricanes data', async () => {
       jest
         .spyOn(hurricaneService, 'getHurricanes')
-        .mockResolvedValue(hurricanesData);
+        .mockResolvedValue(transformedData as never);
+
+      // Mock the response object
       const response: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
+        status: jest.fn().mockReturnThis(), // mockReturnThis is optional but can improve readability
         json: jest.fn(),
       };
+
+      // Call the controller method
       await controller.getAllHurricanes(response as Response);
+      const expected = hurricaneService.transformHurricanesData(
+        response.json() as any,
+      );
+
+      // Verify that the status method was called with OK status
       expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
+
+      // Verify that the json method was called with the expected response object
       expect(response.json).toHaveBeenCalledWith({
         success: true,
         message: 'Hurricanes data fetched successfully',
-        data: hurricanesData,
+        data: expected,
       });
     });
 
