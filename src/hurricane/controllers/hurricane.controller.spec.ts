@@ -79,8 +79,8 @@ describe('HurricaneController', () => {
 
   describe('getHurricanePossibilityForMonth', () => {
     it('should return the possibility of hurricanes for a given month', async () => {
-      const month = 'Jan';
-      const possibility = 50;
+      const month = 'May';
+      const possibility = 9.52;
       jest
         .spyOn(hurricaneService, 'hurricanePossibility')
         .mockResolvedValue(possibility);

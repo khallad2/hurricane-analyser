@@ -41,28 +41,28 @@ export class AppLogger implements LoggerService {
   /**
    * Write a 'log' level log.
    */
-  log(message: any, ...optionalParams: any[]): void {
+  log(message: any): void {
     AppLogger.logToFile(this.combinedLogPath, message);
   }
 
   /**
    * Write a 'fatal' level log.
    */
-  fatal(message: any, ...optionalParams: any[]): void {
+  fatal(message: any): void {
     AppLogger.logToFile(this.errorLogPath, message);
   }
 
   /**
    * Write an 'error' level log.
    */
-  error(message: any, ...optionalParams: any[]): void {
+  error(message: any): void {
     AppLogger.logToFile(this.errorLogPath, message);
   }
 
   /**
    * Write a 'warn' level log.
    */
-  warn(message: any, ...optionalParams: any[]): void {
+  warn(message: any): void {
     AppLogger.logToFile(this.combinedLogPath, message);
   }
 }

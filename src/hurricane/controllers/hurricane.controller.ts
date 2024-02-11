@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { HurricaneService } from '../services/hurricane.service';
 import { IsMonthAbbreviation } from '../validators/month.validator';
-import { AppLogger } from '../../logger/AppLogger';
+import { AppLogger } from '../../logger/app-logger';
 
 /**
  * @file overview

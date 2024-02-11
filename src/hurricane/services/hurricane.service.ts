@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { AppLogger } from '../../logger/AppLogger';
+import { AppLogger } from '../../logger/app-logger';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import axios from 'axios';
 import { IMonth } from '../interfaces/IMonth.interface';
@@ -50,7 +50,6 @@ export class HurricaneService {
       // Listen for the 'data' event to process each chunk of data
       stream.on('data', (chunk: Buffer) => {
         const lines: string[] = chunk.toString().trim().split('\n');
-
         // validate lines and headers
         if (!this.validateData(headers, lines)) {
           this.logger.error('invalid data format');
@@ -74,8 +73,10 @@ export class HurricaneService {
           // Parse and set values for each year
           headers.forEach((year: string, index: number) => {
             year = year.replace(/"/g, '').trim(); // Remove extra double quotes
-            const value: any = this.parseValue(year, values[index]);
-            this.hurricaneData[currentMonth][year] = value;
+            this.hurricaneData[currentMonth][year] = this.parseValue(
+              year,
+              values[index],
+            );
           });
         });
       });
@@ -99,7 +100,7 @@ export class HurricaneService {
    * @param data
    * @private
    */
-  private validateData(headers: string[] | undefined, data: string[]): boolean {
+  private validateData(headers: string[], data: string[]): boolean {
     if (data.length === 0) {
       return false;
     }
