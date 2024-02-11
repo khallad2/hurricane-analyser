@@ -3,9 +3,11 @@
 
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
+
 <p align="center">
   Hurricane-analyser
 </p>
+
 #### Nest.js + Typescript
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
@@ -29,7 +31,8 @@ Assumption:
 - user Authentication and authorization and security aspects are handled using (Middleware & JWT) etc..
 
 If I have more time:
-- Use Interceptors to transform Request/Response
+- Transform Request/Response using Interceptors or Middlewares 
+- Create centralised Exceptions handling using Filters  
 - Implement 95% + testing code coverage
 - create .env.dev & .env.stage
 
