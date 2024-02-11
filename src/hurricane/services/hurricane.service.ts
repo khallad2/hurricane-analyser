@@ -5,7 +5,8 @@ import { AppLogger } from '../../logger/AppLogger';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import axios from 'axios';
 import { IMonth } from '../interfaces/IMonth.interface';
-import { ITransformedData } from '../interfaces/transofrmed-response.interface';
+import { ITransformedData } from '../interfaces/transformed-response.interface';
+import { Readable } from 'stream';
 
 /**
  * Service responsible for managing hurricane-related operations.
@@ -38,45 +39,59 @@ export class HurricaneService {
 
   /**
    * Parses the retrieved data into IHurricane format.
-   * @param {string} data - The data retrieved from the URL.
+   * Applying Streaming to handle large data sets
    * @returns {IHurricane} The parsed hurricane data.
+   * @param stream
    */
-  async parseData(data: string): Promise<IHurricane> {
-    try {
-      const lines: string[] = data.trim().split('\n');
-      const headers: string[] | undefined = this.extractHeaders(lines);
 
-      this.validateData(headers, data);
+  async parseData(stream: Readable): Promise<IHurricane> {
+    return new Promise<IHurricane>((resolve, reject) => {
+      const headers: string[] = [];
 
-      headers.shift(); // Remove "Month" header
+      // Listen for the 'data' event to process each chunk of data
+      stream.on('data', (chunk: Buffer) => {
+        const lines: string[] = chunk.toString().trim().split('\n');
 
-      lines.forEach((line: string) => {
-        const values: string[] = line.trim().split(',');
-        const monthHeader: string = this.extractMonthHeader(values);
+        // validate lines and headers
+        if (!this.validateData(headers, lines)) {
+          this.logger.error('invalid data format');
+          throw new Error('invalid data format');
+        }
 
-        this.setAverageForMonth(monthHeader, values);
+        lines.forEach((line: string) => {
+          const values: string[] = line.trim().split(',');
 
-        headers.forEach((year: string, index: number) => {
-          year = JSON.parse(year);
-          let value: any = values[index];
-          value = this.parseValue(year, value);
-          this.hurricaneData[monthHeader][year] = value;
+          // Extract month header
+          // let currentMonth: string = values.shift()!.trim();
+          let currentMonth: string = values?.shift()?.trim() ?? '';
+
+          // Remove extra double quotes Then trim to
+          // remove leading and trailing spaces
+          currentMonth = currentMonth.replace(/"/g, '').trim();
+
+          // Set hurricane data for the month
+          this.setHurricaneDataForMonth(currentMonth, values);
+
+          // Parse and set values for each year
+          headers.forEach((year: string, index: number) => {
+            year = year.replace(/"/g, '').trim(); // Remove extra double quotes
+            const value: any = this.parseValue(year, values[index]);
+            this.hurricaneData[currentMonth][year] = value;
+          });
         });
       });
 
-      return this.hurricaneData;
-    } catch (error) {
-      this.handleParseError(error);
-    }
-  }
+      // Listen for the 'end' event to indicate the end of data processing
+      stream.on('end', () => {
+        resolve(this.hurricaneData);
+      });
 
-  /**
-   * Extract header from Data
-   * @param lines
-   * @private
-   */
-  private extractHeaders(lines: string[]): string[] | undefined {
-    return lines.shift()?.trim().split(',');
+      // Listen for the 'error' event to handle any errors that occur during data processing
+      stream.on('error', (error: Error) => {
+        this.handleParseError(error);
+        reject(error);
+      });
+    });
   }
 
   /**
@@ -85,31 +100,27 @@ export class HurricaneService {
    * @param data
    * @private
    */
-  private validateData(headers: string[] | undefined, data: string): void {
-    if (!headers || data === '') {
-      this.logger.error('Invalid data format');
-      throw new Error('Invalid data format');
+  private validateData(headers: string[] | undefined, data: string[]): boolean {
+    if (data.length === 0) {
+      return false;
     }
-  }
-
-  /**
-   * Extract month header
-   * @param values
-   * @private
-   */
-  private extractMonthHeader(values: string[]): string {
-    const month = values.shift()?.trim();
-    return JSON.parse(month!.toString());
+    const headerLine = data.shift();
+    headers.push(...headerLine.trim().split(','));
+    headers.shift(); // Remove "Month" header
+    return true;
   }
 
   /**
    * Set Average
-   * @param monthHeader
+   * @param currentMonth
    * @param values
    * @private
    */
-  private setAverageForMonth(monthHeader: string, values: string[]): void {
-    this.hurricaneData[monthHeader] = {
+  private setHurricaneDataForMonth(
+    currentMonth: string,
+    values: string[],
+  ): void {
+    this.hurricaneData[currentMonth] = {
       Average: values['Average'] as never,
     };
   }
@@ -129,7 +140,7 @@ export class HurricaneService {
    * @param error
    * @private
    */
-  private handleParseError(error: any): void {
+  private handleParseError(error: Error): void {
     this.logger.error(`Failed to parse hurricanes data - ${error.message}`);
   }
 
@@ -152,13 +163,13 @@ export class HurricaneService {
         return null;
       }
       // use union type to ensure type safety with more than one type
-      let avg: string | number = monthData['Average'];
+      let average: string | number = monthData['Average'];
 
-      // if Avg in the data source to this month = 0.0
+      // if average in the data source to this month = 0.0
       // then set average to 0.01 to prevent Zero probability
-      avg = avg === '0.00' ? 0.01 : parseFloat(monthData['Average']);
+      average = average === '0.00' ? 0.01 : parseFloat(monthData['Average']);
       // Calculate the probability of observing zero hurricanes
-      const probabilityOfZero = Math.exp(-avg);
+      const probabilityOfZero = Math.exp(-average);
       // Calculate the probability of at least one hurricane
       const probabilityOfAtLeastOne: number = 1 - probabilityOfZero;
       // return a percentage
@@ -177,9 +188,10 @@ export class HurricaneService {
     try {
       const data: string = await this.loadDataFromUrl();
       if (!data) {
-        throw new Error('Failed to load data from the source.');
+        return null;
       }
-      return await this.parseData(data);
+      const stream = Readable.from([data]);
+      return await this.parseData(stream);
     } catch (error) {
       this.logger.error(`Error getting hurricanes data: ${error.message}`);
       throw new Error(
@@ -245,7 +257,7 @@ export class HurricaneService {
       }
       return transformedData;
     } catch (error) {
-      console.error(`Error transforming hurricanes data: ${error.message}`);
+      this.logger.error(`Error transforming hurricanes data: ${error.message}`);
       throw new Error('Failed to transform hurricanes data.');
     }
   }

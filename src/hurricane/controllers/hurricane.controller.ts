@@ -20,7 +20,7 @@ export class HurricaneController {
    * @param response
    */
   @Get('all')
-  async getAllHurricanes(@Res() response: Response): Promise<Response> {
+  async fetchAllHurricanes(@Res() response: Response): Promise<Response> {
     try {
       const hurricanesData = await this.hurricaneService.getHurricanes();
       if (!hurricanesData) {
@@ -41,7 +41,7 @@ export class HurricaneController {
       this.logger.error(`Error fetching hurricanes data: ${error.message}`);
       return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: 'Failed to fetch hurricanes data. Please try again.',
+        message: 'Error fetching hurricanes data',
         data: {},
       });
     }

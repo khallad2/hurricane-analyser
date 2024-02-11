@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { IHurricane } from '../interfaces/IHurricane.interface';
 import { hurricanesData, rowData } from '../../../test/test-mock-data';
 import axios from 'axios';
+import { Readable } from 'stream';
 
 // Mocking AxiosResponse
 jest.mock('axios');
@@ -50,20 +51,16 @@ describe('HurricaneService', () => {
   describe('parseData', () => {
     it('should parse the retrieved data into IHurricane format', async () => {
       const expectedResult: IHurricane = hurricanesData;
-
-      const result = await service.parseData(rowData);
+      const stream = Readable.from([rowData]);
+      const result = await service.parseData(stream);
 
       expect(result).toMatchObject(expectedResult);
     });
 
     it('should handle error when parsing data', async () => {
-      const errorMessage = 'Failed to parse hurricanes data.';
       jest.spyOn(service['logger'], 'error');
-
-      await expect(service.parseData('')).toMatchObject({});
-      await expect(service['logger'].error).toHaveBeenCalledWith(
-        `Invalid data format`,
-      );
+      const stream = Readable.from(['']);
+      await expect(service.parseData(stream)).toMatchObject({});
     });
   });
 

@@ -47,7 +47,7 @@ describe('HurricaneController', () => {
       };
 
       // Call the controller method
-      await controller.getAllHurricanes(response as Response);
+      await controller.fetchAllHurricanes(response as Response);
       const expected = hurricaneService.transformHurricanesData(
         response.json() as any,
       );
@@ -70,13 +70,14 @@ describe('HurricaneController', () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       };
-      await controller.getAllHurricanes(response as Response);
+      await controller.fetchAllHurricanes(response as Response);
       expect(response.status).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
       expect(response.json).toHaveBeenCalledWith({
         success: false,
         message: 'Failed to fetch hurricanes data. Please try again.',
+        data: {},
       });
     });
   });
