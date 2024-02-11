@@ -20,7 +20,7 @@ https://en.wikipedia.org/wiki/Poisson_distribution
 
 This backend contains two Rest API endpoints:
  - /api/hurricanes/all
- - /api/hurricanes/expect/:monthString ex: [Jan, Feb, ....]
+ - /api/hurricanes/expect/:month       Month ex: [Jan, Feb, ....]
 
 The program is using the following file as the data source:
 https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv
