@@ -8,7 +8,6 @@
     Nest.js + Typescript
 </p>
 
-
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
@@ -26,15 +25,10 @@ This backend contains two Rest API endpoints:
 The program is using the following file as the data source:
 https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv
 
-Assumption: 
-- user only need to provide the month name to get the probability of a hurricane.
+Assumption:
+- user only need to provide a short-month name to get the probability of a hurricane.
 - user Authentication and authorization and security aspects are handled using (Middleware & JWT) etc..
-
-If I have more time:
-- Transform Request/Response using Interceptors or Middlewares 
-- Create centralised Exceptions handling using Filters  
-- Implement 95% + testing code coverage
-- create .env.dev & .env.stage
+- Selected Probability formula: Used Poisson Distribution Formula and used the provided Average in the data source
 
 ## Environment Prerequisites
 - Node.js >= 20.10.0
@@ -75,23 +69,14 @@ $ npm run test:cov
 ```
 
 
+### If I have more time I would do the following:
+- Enhance performance by optimizing parseData
+- Enhance interfaces
+- Transform Request/Response using Interceptors or Middlewares
+- Create centralised Exceptions handling using Filters
+- Implement 95% + testing code coverage
+- Add all constant strings to constants.ts for better errorMessages organizing
+- Create .env.dev & .env.stage
 
 
-Run the application (please have a look to scripts in package.json )
-in the root dir of the project root 'hurricane-analyser'
-- to install dependencies $- npm install
-- to run in dev mode  $- npm start dev
-- to run in debug mode  $- npm start debug
-- on deployment $- npm run build start prod $- npm start prod
-
-Testing the application
-in the root dir of the project root 'hurricane-analyser'
--  run unit-tests $- npm test
--  run tests with Coverage info $- npm run test:cov
--  run e2e test $- npm run test:e2e
-
-
-if i have more time
-
-i will Use Interceptors
-i will cover the test code 95% +
+### I hope we can talk about it soon!

@@ -76,7 +76,7 @@ describe('HurricaneController', () => {
       );
       expect(response.json).toHaveBeenCalledWith({
         success: false,
-        message: 'Failed to fetch hurricanes data. Please try again.',
+        message: 'Error fetching hurricanes data',
         data: {},
       });
     });

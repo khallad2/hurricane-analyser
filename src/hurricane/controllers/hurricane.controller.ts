@@ -5,7 +5,11 @@ import { IsMonthAbbreviation } from '../validators/month.validator';
 import { AppLogger } from '../../logger/AppLogger';
 
 /**
+ * @file overview
  * Controller responsible for handling hurricane-related endpoints.
+ * has two end points
+ * -  fetchAllHurricanes route: /all
+ * -  getHurricanePossibilityForMonth rout: /expect/:month
  */
 @Controller('api/hurricanes')
 export class HurricaneController {

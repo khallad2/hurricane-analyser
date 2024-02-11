@@ -4,23 +4,11 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common';
+import { constants } from '../../../constants';
 
 @Injectable()
 export class IsMonthAbbreviation implements PipeTransform<string, string> {
-  private readonly months: string[] = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  private readonly months: string[] = constants.MONTH_NAMES;
 
   /**
    * Transforms the input value into a valid month abbreviation.

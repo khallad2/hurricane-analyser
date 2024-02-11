@@ -43,7 +43,6 @@ export class HurricaneService {
    * @returns {IHurricane} The parsed hurricane data.
    * @param stream
    */
-
   async parseData(stream: Readable): Promise<IHurricane> {
     return new Promise<IHurricane>((resolve, reject) => {
       const headers: string[] = [];
@@ -111,7 +110,7 @@ export class HurricaneService {
   }
 
   /**
-   * Set Average
+   * Set hurricane Data for a given month
    * @param currentMonth
    * @param values
    * @private
@@ -126,7 +125,7 @@ export class HurricaneService {
   }
 
   /**
-   * Parse year
+   * Parse Value
    * @param year
    * @param value
    * @private
@@ -158,13 +157,11 @@ export class HurricaneService {
   ): Promise<number | null> {
     try {
       const monthData: IMonth = hurricanesData[futureMonth];
-
       if (!monthData) {
         return null;
       }
       // use union type to ensure type safety with more than one type
       let average: string | number = monthData['Average'];
-
       // if average in the data source to this month = 0.0
       // then set average to 0.01 to prevent Zero probability
       average = average === '0.00' ? 0.01 : parseFloat(monthData['Average']);
@@ -243,7 +240,6 @@ export class HurricaneService {
                     transformedData.years[year] = 0;
                   }
                   transformedData.years[year] += value;
-
                   // Populate months object
                   if (!transformedData.months[month]) {
                     transformedData.months[month] = 0;
